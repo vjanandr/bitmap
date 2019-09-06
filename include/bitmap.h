@@ -6,17 +6,29 @@
 #ifndef __BITMAP_H__
 #define __BITMAP_H__
 
-#define BITMAP_INIT_HANDLE NULL
+#define BITMAP_HANDLE_INIT NULL
 #define BITMAP_SIZE_1K_BITS 1024
 
-typedef struct bitmap_t* bitmap_handle;
+/**
+ * Bit map handle 
+ */
+typedef struct bitmap_t_* bitmap_handle;
+
+/**
+ * Retval for apis.
+ */
 typedef bitmap_retval_t_ {
     BITMAP_RETVAL_SUCCESS,
     BITMAP_RETVAL_FAILURE,
+    BITMAP_RETVAL_INVALID_INPUT,
 } bitmap_retval_t;
 
+/**
+ * Attributed structure to set parameter of a bitmap.
+ */
 typedef struct bitmap_attr_t_ {
     uint32_t block_size;
+    char short_name[10]; // Name is a mandatory parameter
 } bitmap_attr_t;
 
 /**
@@ -35,3 +47,32 @@ bitmap_retval_t bitmap_create(bitmap_handle *handle,
  *        - FAILURE if failed to destroy
  */
 bitmap_retval_t bitmap_destroy(bitmap_handle handle);
+
+/**
+ * @ bitmap_set
+ * set a bit corresponding to a position
+ * retval - SUCCESS if successfully set the bit
+ *        - FAILURE if failed to set the bit
+ */
+bitmap_retval_t bitmap_set(bitmap_handle handle, 
+                           uint16_t bitpos);
+
+/**
+ * @ bitmap_clear
+ * clear a bit corresponding to a position
+ * retval - SUCCESS if successfully cleared the bit
+ *        - FAILURE if failed to clear the bit
+ */
+bitmap_retval_t bitmap_clear(bitmap_handle handle,
+                           uint16_t bitpos);
+
+/**
+ * @ bitmap_check_bit_pos
+ * check a bit position.
+ * retval - SUCCESS if successfully set the bit
+ *        - FAILURE if failed to set the bit
+ */
+bool bitmap_check_bit_pos(bitmap_handle handle);
+
+#endif // __BITMAP_H__
+                          
