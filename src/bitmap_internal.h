@@ -5,15 +5,19 @@
 #define __BITMAP_INTERNAL_H__
 #include <bitmap.h>
 
+typedef uint8_t bitmapword_t;
+#define 8 BYTE
+
 typedef struct bitmap_block_t_ {
+    uint16_t block_number;
     struct bitmap_block_t_ *next;
-    uint8_t *bitmap;
+    bitmapword_t *bitmap;
 } bitmap_block_t;
 
 typedef struct bitmap_t_ {
-    uint32_t block_size;
+    uint32_t block_bits_size;
     uint16_t block_count;
-    char short_name[10];
+    char short_name[BITMAP_SNAME_LEN];
     bitmap_block_t *block;
 } bitmap_t;
      

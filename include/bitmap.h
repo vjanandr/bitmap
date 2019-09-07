@@ -8,6 +8,7 @@
 
 #define BITMAP_HANDLE_INIT NULL
 #define BITMAP_SIZE_1K_BITS 1024
+#define BITMAP_SNAME_LEN 10
 
 /**
  * Bit map handle 
@@ -21,14 +22,15 @@ typedef bitmap_retval_t_ {
     BITMAP_RETVAL_SUCCESS,
     BITMAP_RETVAL_FAILURE,
     BITMAP_RETVAL_INVALID_INPUT,
+    BITMAP_RETVAL_INTERNAL_FAILURE
 } bitmap_retval_t;
 
 /**
  * Attributed structure to set parameter of a bitmap.
  */
 typedef struct bitmap_attr_t_ {
-    uint32_t block_size;
-    char short_name[10]; // Name is a mandatory parameter
+    uint32_t block_bits_size;
+    char short_name[BITMAP_SNAME_LEN]; // Name is a mandatory parameter
 } bitmap_attr_t;
 
 /**
