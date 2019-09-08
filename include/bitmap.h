@@ -63,7 +63,7 @@ bitmap_destroy(bitmap_handle *handle);
  */
 bitmap_retval_t
 bitmap_set(bitmap_handle handle, 
-                           uint16_t bitpos);
+           uint16_t bitpos);
 
 /**
  * @ bitmap_clear
@@ -73,7 +73,7 @@ bitmap_set(bitmap_handle handle,
  */
 bitmap_retval_t
 bitmap_clear(bitmap_handle handle,
-                           uint16_t bitpos);
+             uint16_t bitpos);
 /**
  * @ bitmap_clear_all
  * clear a bit corresponding to a position
@@ -85,13 +85,13 @@ bitmap_clear_all(bitmap_handle handle);
 
 
 /**
- * @ bitmap_check_bit_pos
+ * @ bitmap_check
  * check a bit position.
  * retval - SUCCESS if successfully set the bit
  *        - FAILURE if failed to set the bit
  */
 bitmap_retval_t
-bitmap_check_bit_pos(bitmap_handle handle, uint16_t bitpos);
+bitmap_check(bitmap_handle handle, uint16_t bitpos);
 
 /**
  * @ bitmap_get_block_details
@@ -116,5 +116,21 @@ bitmap_get_block_details(bitmap_handle handle,
 bitmap_retval_t
 bitmap_get_block_count(bitmap_handle handle,
                        uint16_t *count);
+/**
+ * @bitmap_get_wordsize
+ * Get the number of bits in a word
+ *
+ * retval - SUCCESS if retreive wordsize successfully
+ *        - FAILURE if failed to retrieve word size
+ */
+bitmap_retval_t
+bitmap_get_wordsize(uint16_t *size);
+
+/**
+ * @bitmap_set_logger_fd
+ * Set FD for logger
+ */
+bitmap_retval_t
+bitmap_set_logger_fd(uint16_t fd);
+
 #endif // __BITMAP_H__
-                          

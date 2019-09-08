@@ -2,22 +2,57 @@
 #include <math.h>
 #include <string.h>
 
-//int log_fd_ = STDOUT_FILENO;
+int log_fd_ = STDOUT_FILENO;
+
+#define is_log_enabled 1
 
 #define BITMAP_GET_BLOCK_NUMBER(bitmap_ptr, bitpos) \
         (int)(bitpos / bitmap_ptr->bits_per_block)
 
 #define BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos) \
-        (int)((bitpos % bitmap_ptr->bits_per_block) / sizeof(bitmapword_t))
+        (int)((bitpos % bitmap_ptr->bits_per_block) / (sizeof(bitmapword_t) * BYTE))
 
 #define BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos) \
         (int)((bitpos % bitmap_ptr->bits_per_block) %  \
-                 sizeof(bitmapword_t))
+                 (sizeof(bitmapword_t) * BYTE))
+
+static inline
+void vprint (char *fmt, va_list args)
+{
+    struct timeval tv1;
+    gettimeofday(&tv1, NULL);
+
+    struct tm tm1;
+    localtime_r(&tv1.tv_sec, &tm1);
+
+    char tbuf[64];
+    strftime(tbuf, sizeof(tbuf), "%F-%T", &tm1);
+
+    if (fmt && fmt[0] == '\n') {
+        // Print data and time only if its a new line.
+        dprintf(log_fd_, "\n[%s.%u] - ", tbuf, (unsigned int)tv1.tv_usec/1000);
+        fmt = fmt+1;
+    }
+    vdprintf(log_fd_, fmt, args);
+}
+
+static inline
+void vlog (char *fmt, ...)
+{
+    va_list args;
+
+    if (is_log_enabled) {
+        va_start(args, fmt);
+        vprint(fmt, args);
+        va_end(args);
+    }
+}
 
 void* bitmap_malloc (size_t size) 
 {
     return (malloc(size));
 }
+
 void bitmap_free (void *mem)
 {
     free(mem);
@@ -48,6 +83,9 @@ bitmap_add_block (struct bitmap_t_ *bitmap_ptr)
     bitmap_block_t *block_ptr, *new_block;
 
     if (!bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
 
@@ -176,6 +214,7 @@ bitmap_get_block (struct bitmap_t_ *bitmap_ptr,
     int block_number = BITMAP_GET_BLOCK_NUMBER(bitmap_ptr, bitpos);
 
     if (bitmap_ptr) {
+        block = bitmap_ptr->block;
         while (block) {
             if (block->block_number == block_number) {
                 break;
@@ -197,13 +236,24 @@ bitmap_set (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
 
     block_number = word_pos_offset = word_pos = 0;
     if (!bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     block_number = BITMAP_GET_BLOCK_NUMBER(bitmap_ptr, bitpos);
-    while (bitmap_ptr->block_count - (block_number+1)) {
+    vlog("\n%s [%s] sname %s, set bit %d block_count %d block number %d",
+            bitmap_get_log_string(BITMAP_EVENT), 
+            __FUNCTION__, bitmap_ptr->short_name,
+            bitpos, bitmap_ptr->block_count, block_number);
+    while (bitmap_ptr->block_count < (block_number + 1)) {
         // block count is one more than block number.
         // Block number starts from 1, block count starts from 0
         retval = bitmap_add_block(bitmap_ptr);
+        vlog("\n%s [%s] sname %s, adding new block %d ",
+            bitmap_get_log_string(BITMAP_EVENT), 
+            __FUNCTION__, bitmap_ptr->short_name,
+            bitmap_ptr->block_count);
     }
     block = bitmap_get_block(bitmap_ptr, bitpos);
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
@@ -221,19 +271,31 @@ bitmap_check (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
 
     block_count = word_pos_offset = word_pos = 0;
     if (!bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
 
     block = bitmap_get_block(bitmap_ptr, bitpos);
     if (!block) {
         // Such a bit was never set.
+		vlog("\n%s [%s] sname %s Bit pos %d not available in bitmap",
+          bitmap_get_log_string(BITMAP_ERROR),
+          __FUNCTION__, bitmap_ptr->short_name, bitpos);
         return BITMAP_RETVAL_MATCH_FAIL;
     }
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
-    if (block->bitmap[word_pos] &  (b_one << word_pos_offset) ) {
+    if (block->bitmap[word_pos] & (b_one << word_pos_offset)) {
+		vlog("\n%s [%s] sname %s Bitpos %d set",
+          bitmap_get_log_string(BITMAP_EVENT),
+          __FUNCTION__, bitmap_ptr->short_name, bitpos);
         return BITMAP_RETVAL_MATCHED;
     }
+    vlog("\n%s [%s] sname %s Bitpos %d not set",
+          bitmap_get_log_string(BITMAP_EVENT),
+          __FUNCTION__, bitmap_ptr->short_name, bitpos);
     return BITMAP_RETVAL_MATCH_FAIL;
 }
 
@@ -246,17 +308,26 @@ bitmap_clear (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
 
     block_count = word_pos_offset = word_pos = 0;
     if (!bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
 
     block = bitmap_get_block(bitmap_ptr, bitpos);
     if (!block) {
         // Such a bit was never set.
+        vlog("\n%s [%s] sname %s Invalid bitpos %d",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__, bitmap_ptr->short_name, bitpos);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
     block->bitmap[word_pos] = block->bitmap[word_pos] & (~(b_one << word_pos_offset)); 
+    vlog("\n%s [%s] sname %s bitpos %d cleared",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__, bitmap_ptr->short_name, bitpos);
     return BITMAP_RETVAL_SUCCESS;
 }
 
@@ -267,6 +338,9 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
     bitmap_block_t *block, *curr_block;
 
     if (!bitmap_ptr || !*bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     
@@ -275,11 +349,18 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
 
     while (block) {
         curr_block = block;
+        vlog("\n%s [%s] sname %s destroy block %d",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__, ptr->short_name, 
+                curr_block->block_number);
         block = block->next;
         curr_block->next = NULL;
         bitmap_free(curr_block->bitmap);
         bitmap_free(curr_block);
     }
+    vlog("\n%s [%s] sname %s destroy ",
+           bitmap_get_log_string(BITMAP_ERROR),
+           __FUNCTION__, ptr->short_name);
     ptr->block = NULL;
     bitmap_free(ptr);
     *bitmap_ptr = NULL;
@@ -291,6 +372,9 @@ bitmap_clear_all (struct bitmap_t_ *bitmap_ptr)
 {
     bitmap_block_t *block;
     if (!bitmap_ptr) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     
@@ -298,8 +382,15 @@ bitmap_clear_all (struct bitmap_t_ *bitmap_ptr)
 
     while (block) {
         memset(block->bitmap, 0, bitmap_ptr->bytes_per_block);
+		vlog("\n%s [%s] sname %s clear block %d",
+			  bitmap_get_log_string(BITMAP_EVENT),
+			  __FUNCTION__, bitmap_ptr->short_name,
+              block->block_number);
         block = block->next;
     }
+    vlog("\n%s [%s] sname %s clear all block",
+          bitmap_get_log_string(BITMAP_EVENT),
+          __FUNCTION__, bitmap_ptr->short_name);
     return BITMAP_RETVAL_SUCCESS;
 }
 
@@ -311,6 +402,9 @@ bitmap_get_block_details (struct bitmap_t_ *bitmap_ptr,
 {
     if (!bitmap_ptr || 
         (!bits_per_block && !bytes_per_block && !words_per_block)) {
+        vlog("\n%s [%s] Invalid handle or input pointers",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     if (bits_per_block)
@@ -328,8 +422,30 @@ bitmap_get_block_count (struct bitmap_t_ *bitmap_ptr,
                         uint16_t *count)
 {
     if (!bitmap_ptr || !count) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
     *count = bitmap_ptr->block_count;
+    return BITMAP_RETVAL_SUCCESS;
+}
+
+bitmap_retval_t
+bitmap_get_wordsize (uint16_t *size)
+{
+    if (!size) {
+        vlog("\n%s [%s] Invalid handle",
+                bitmap_get_log_string(BITMAP_ERROR),
+                __FUNCTION__);
+    }
+    *size = sizeof(bitmapword_t);
+    return BITMAP_RETVAL_SUCCESS;
+}
+
+bitmap_retval_t
+bitmap_set_logger_fd (uint16_t fd)
+{
+    log_fd_ = fd;
     return BITMAP_RETVAL_SUCCESS;
 }
