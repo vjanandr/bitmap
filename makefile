@@ -10,34 +10,31 @@ CFLAGS = -g -Wuninitialized -Wreturn-type \
 		 -Wunused-label -Wunused-value -Wunused-variable \
 		 -Wimplicit-function-declaration -Wimplicit-int -Wmissing-braces \
 		 -Wnonnull -Wparentheses
-#CFLAGS = -g
-
-#COMPILE.cc = $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-#COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-#LINK.o = $(CC) $(LDFLAGS) $(TARGET_ARCH)
-#OUTPUT_OPTION = -o $@
-
 
 INC_DIRS = -I./include
 
-test: bitmaptest
+build:bitmap_basic_test.o
 
-bitmaptest.o: bitmap.o ./tree/test/olibc_tree_test.c
-	$(cc) $(CFLAGS) $(INC_DIRS) -o treetest $^ -lcunit
+test: bitmaptest_basic
 
-treetest: treetest.o
-	./treetest
+testall: bitmap_sa bitmaptest_basic bitmaptest_basic_mem
 
-simple: treetest.o
-	ls
+bitmap_basic_test.o: bitmap.o ./test/bitmap_basic_test.c
+	$(cc) $(CFLAGS) $(INC_DIRS) -o bitmaptest_basic $^ -lcunit
 
-treetestmem: treetest.o
-	valgrind --tool=memcheck --leak-check=full --error-exitcode=9 ./treetest || (echo "Leak detected"; exit 1)
+bitmaptest_basic: bitmap_basic_test.o
+	./bitmaptest_basic
 
-olibc_tree.o: ./tree/src/olibc_tree.c
+bitmaptest_basic_mem: bitmap_basic_test.o
+	valgrind -v --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=9 ./bitmaptest_basic || (echo "Leak detected"; exit 1)
+
+bitmap_sa:
+	cppcheck .
+
+bitmap.o: ./src/bitmap.c
 	$(cc) $(CFLAGS) $(INC_DIRS) -c $^
 
 .PHONY: clean
 
 clean:
-	rm -f *.o treetest a.out
+	rm -f *.o bitmaptest_basic
