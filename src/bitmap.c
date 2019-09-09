@@ -151,7 +151,6 @@ bitmap_create (bitmap_handle *handle,
 
     bitmap_ptr = (struct bitmap_t_ *) 
               bitmap_malloc(sizeof(struct bitmap_t_));
-    bitmap_ptr->mem_sanity = VALID_MEM;
 
     if (!bitmap_ptr) {
         // Memory allocation to the bitmap ptr failed.
@@ -162,6 +161,7 @@ bitmap_create (bitmap_handle *handle,
     }
     memset(bitmap_ptr, 0, sizeof(struct bitmap_t_));
 
+    bitmap_ptr->mem_sanity = VALID_MEM;
     bitmap_ptr->block_count = 0;
 
     if (attr) {
@@ -344,7 +344,7 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
     struct bitmap_t_ *ptr;
     bitmap_block_t *block, *curr_block;
 
-    if (!bitmap_ptr && !BITMAP_VALIDATE_MEM(*bitmap_ptr)) {
+    if (!bitmap_ptr || !BITMAP_VALIDATE_MEM(*bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -352,7 +352,6 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
     }
     
     ptr = *bitmap_ptr;
-    ptr->
     block = ptr->block;
 
     while (block) {
