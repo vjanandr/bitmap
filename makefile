@@ -13,14 +13,13 @@ CFLAGS = -g -Wuninitialized -Wreturn-type \
 
 INC_DIRS = -I./include
 
-build:bitmap_basic_test.o
+bitmap_basic_test.o: bitmap.o ./test/bitmap_basic_test.c
+	$(cc) $(CFLAGS) $(INC_DIRS) -o bitmaptest_basic $^ -lcunit
 
 test: bitmaptest_basic
 
 testall: bitmap_sa bitmaptest_basic bitmaptest_basic_mem
 
-bitmap_basic_test.o: bitmap.o ./test/bitmap_basic_test.c
-	$(cc) $(CFLAGS) $(INC_DIRS) -o bitmaptest_basic $^ -lcunit
 
 bitmaptest_basic: bitmap_basic_test.o
 	./bitmaptest_basic

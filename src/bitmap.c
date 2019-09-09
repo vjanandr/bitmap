@@ -16,7 +16,8 @@ int log_fd_ = STDOUT_FILENO;
         (int)((bitpos % bitmap_ptr->bits_per_block) %  \
                  (sizeof(bitmapword_t) * BYTE))
 
-static inline
+#define BITMAP_VALIDATE_MEM(ptr) ((ptr) ? ((ptr)->mem_sanity == VALID_MEM):0)
+
 void vprint (char *fmt, va_list args)
 {
     struct timeval tv1;
@@ -36,7 +37,6 @@ void vprint (char *fmt, va_list args)
     vdprintf(log_fd_, fmt, args);
 }
 
-static inline
 void vlog (char *fmt, ...)
 {
     va_list args;
@@ -82,7 +82,7 @@ bitmap_add_block (struct bitmap_t_ *bitmap_ptr)
 {
     bitmap_block_t *block_ptr, *new_block;
 
-    if (!bitmap_ptr) {
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -101,13 +101,13 @@ bitmap_add_block (struct bitmap_t_ *bitmap_ptr)
     new_block->bitmap = (bitmapword_t *) 
         bitmap_malloc(bitmap_ptr->bytes_per_block);
     // Number of words x sizeof a word
-    memset(new_block->bitmap, 0, 
-          bitmap_ptr->bytes_per_block);
-
     if (!new_block->bitmap) {
         bitmap_free(new_block);
         return BITMAP_RETVAL_INTERNAL_FAILURE;
     }
+    memset(new_block->bitmap, 0, 
+          bitmap_ptr->bytes_per_block);
+
 
     if (block_ptr == NULL) {
         // This is the first block in the bitmap.
@@ -141,7 +141,7 @@ bitmap_create (bitmap_handle *handle,
     }
 
     if (attr) {
-        if (attr->bits_per_block % (sizeof(bitmapword_t) * BYTE) != 0) {
+        if (attr->bits_per_block % ((sizeof(bitmapword_t) * BYTE)) != 0) {
             vlog("\n%s [%s] Invalid bits per block config ",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -151,6 +151,7 @@ bitmap_create (bitmap_handle *handle,
 
     bitmap_ptr = (struct bitmap_t_ *) 
               bitmap_malloc(sizeof(struct bitmap_t_));
+    bitmap_ptr->mem_sanity = VALID_MEM;
 
     if (!bitmap_ptr) {
         // Memory allocation to the bitmap ptr failed.
@@ -235,17 +236,20 @@ bitmap_set (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     bitmapword_t b_one = 0x01;
 
     block_number = word_pos_offset = word_pos = 0;
-    if (!bitmap_ptr) {
+
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
+
     block_number = BITMAP_GET_BLOCK_NUMBER(bitmap_ptr, bitpos);
     vlog("\n%s [%s] sname %s, set bit %d block_count %d block number %d",
             bitmap_get_log_string(BITMAP_EVENT), 
             __FUNCTION__, bitmap_ptr->short_name,
             bitpos, bitmap_ptr->block_count, block_number);
+
     while (bitmap_ptr->block_count < (block_number + 1)) {
         // block count is one more than block number.
         // Block number starts from 1, block count starts from 0
@@ -255,10 +259,12 @@ bitmap_set (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
             __FUNCTION__, bitmap_ptr->short_name,
             bitmap_ptr->block_count);
     }
+
     block = bitmap_get_block(bitmap_ptr, bitpos);
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
     block->bitmap[word_pos] = block->bitmap[word_pos] | (b_one << word_pos_offset); 
+
     return BITMAP_RETVAL_SUCCESS;
 }
 
@@ -270,7 +276,8 @@ bitmap_check (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     bitmapword_t b_one = 0x01;
 
     block_count = word_pos_offset = word_pos = 0;
-    if (!bitmap_ptr) {
+
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -307,7 +314,7 @@ bitmap_clear (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     bitmapword_t b_one = 0x01;
 
     block_count = word_pos_offset = word_pos = 0;
-    if (!bitmap_ptr) {
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -337,7 +344,7 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
     struct bitmap_t_ *ptr;
     bitmap_block_t *block, *curr_block;
 
-    if (!bitmap_ptr || !*bitmap_ptr) {
+    if (!bitmap_ptr && !BITMAP_VALIDATE_MEM(*bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -345,6 +352,7 @@ bitmap_destroy (struct bitmap_t_ **bitmap_ptr)
     }
     
     ptr = *bitmap_ptr;
+    ptr->
     block = ptr->block;
 
     while (block) {
@@ -371,7 +379,8 @@ bitmap_retval_t
 bitmap_clear_all (struct bitmap_t_ *bitmap_ptr)
 {
     bitmap_block_t *block;
-    if (!bitmap_ptr) {
+
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr)) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
@@ -400,7 +409,7 @@ bitmap_get_block_details (struct bitmap_t_ *bitmap_ptr,
                           uint32_t *bytes_per_block,
                           uint32_t *words_per_block)
 {
-    if (!bitmap_ptr || 
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr) ||
         (!bits_per_block && !bytes_per_block && !words_per_block)) {
         vlog("\n%s [%s] Invalid handle or input pointers",
                 bitmap_get_log_string(BITMAP_ERROR),
@@ -421,7 +430,7 @@ bitmap_retval_t
 bitmap_get_block_count (struct bitmap_t_ *bitmap_ptr,
                         uint16_t *count)
 {
-    if (!bitmap_ptr || !count) {
+   if (!BITMAP_VALIDATE_MEM(bitmap_ptr) || !count) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);

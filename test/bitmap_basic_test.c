@@ -287,6 +287,12 @@ void bitmap_basic_1_destroy()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_check(handle1, 3000);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
+
+    retval = bitmap_destroy(&handle2);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+
+    retval = bitmap_destroy(&handle3);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
 }
 
 int main ()

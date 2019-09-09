@@ -13,6 +13,9 @@
 #include <sys/time.h>
 #include <time.h>
 
+#define VALID_MEM 0xABCD
+#define DEAD_MEM 0xDEAD
+
 typedef uint8_t bitmapword_t;
 #define BYTE 8
 
@@ -27,6 +30,7 @@ typedef struct bitmap_t_ {
     uint32_t bytes_per_block;
     uint32_t words_per_block;
     uint16_t block_count;
+    uint16_t mem_sanity;
     char short_name[BITMAP_SNAME_LEN];
     bitmap_block_t *block;
 } bitmap_t;

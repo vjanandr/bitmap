@@ -1,27 +1,19 @@
 Implementation of Bitmap library.
+---------------------------------
+Getting Started Guide
 
-Design Considerations
-======================
-a. Should be agnostic of host byte ordering and host architecture.
-b. The dynamic increase in number of bits in the bitmap would be less likely, but poossible neverthless.
-c. Need to provide matching of 1000s of bits.
-d. Should be able to create multiple instances of the bitmap.
-e. To optimize memory and at the same time not compremise on speed of execution following are considered.
-    Blocks of multiples of 8 are allocated.
-    1024 bits per block would allocated 128 8 byte contiguous memory. 
-    // This is about 1kbs per block.
-    We could have a list of these blocks, to support increase in size dynamically. 
-    New blocks will be added when the bit to be set is more than that is currently available.  
-    The application creating the instance should decide what should be the block size. 
-    A very large block would have memory implications and a very small block would impact speed of execution.
-    The right combination could be arrived at heuristically or the context of usage.
-f. This would be a library and no assumption of the behavior of the application would be made.
-g. Delete of an instance would delete all the blocks allocated.
-h. Thread safe: 
-i. The range of the bits is 0 - 65535.
-j. The implementation is not very ideally for sparsely populated bits. 
-   Its assumed that the bits each represent some kind of ID of a session..
-   The IDs thus generated even if they are reused would be contiguous and less likely to be sparesely populated.
-k. API unit testing will be performed using CUNIT.
-l. Static analysis would be done using CPPcheck.
-m. Valgrind will be run to check for possible memory leaks.
+1. Install the following packages to build and test.
+    a. Cunit -- Unit Test frame work for automated testing.
+    b. CPPCheck -- Static Analysis.
+    c. Valgrind -- Test memory related issues.
+2. make 
+        -- build the library bitmap.o and link it with test/bitmap_basic_test.c
+        -- The binary executable thus created is bitmaptest_basic.
+3. make testall 
+        -- Does a static analysis using CPPCheck on the code base.
+        -- builds the executable bitmaptest_basic
+        -- Uses CUnit framework to test all unit test cases.
+        -- Uses Valgrind to test possible memory issues 
+           when unit test framework is running.
+4. When bitmaptest_basic is run, the log files are reidrected to /tmp 
+   the location is printed for reference as well with a random extension everytime.
