@@ -1,78 +1,76 @@
-
 Static Analysis using CPPCheck
-==============================
+===============================
 cppcheck .
 Checking src/bitmap.c ...
 1/2 files checked 50% done
 Checking test/bitmap_test.c ...
 2/2 files checked 100% done
 
-Cunit Test
-===========
-
+Build and Test CUnit
+======================
 gcc -g -Wuninitialized -Wreturn-type -Wunused-label -Wunused-value -Wunused-variable -Wimplicit-function-declaration -Wimplicit-int -Wmissing-braces -Wnonnull -Wparentheses -I./include -o bitmaptest bitmap.o test/bitmap_test.c -lcunit
 test/bitmap_test.c: In function ‘test_bitmap_set’:
-test/bitmap_test.c:215:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:220:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_set(handle3, 65536);
                                   ^~~~~
-test/bitmap_test.c:232:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:238:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_set(handle2, -65535);
                                   ^
-test/bitmap_test.c:241:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:248:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_set(handle3, -65535);
                                   ^
-test/bitmap_test.c:253:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:261:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_set(handle3, 90000);
                                   ^~~~~
 test/bitmap_test.c: In function ‘test_bitmap_check’:
-test/bitmap_test.c:300:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:308:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle2, 65536);
                                     ^~~~~
-test/bitmap_test.c:307:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:315:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle3, 65536);
                                     ^~~~~
-test/bitmap_test.c:316:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:324:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle2, -65535);
                                     ^
-test/bitmap_test.c:322:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:330:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle3, -65535);
                                     ^
-test/bitmap_test.c:325:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:333:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle2, 90000);
                                     ^~~~~
 test/bitmap_test.c: In function ‘test_bitmap_clear’:
-test/bitmap_test.c:371:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:380:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle1, 65536);
                                     ^~~~~
-test/bitmap_test.c:386:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:395:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_clear(handle3, -65535);
                                     ^
-test/bitmap_test.c:393:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:419:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_clear(handle2, 90000);
                                     ^~~~~
-test/bitmap_test.c:396:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:422:34: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_set(handle3, 90000);
                                   ^~~~~
 test/bitmap_test.c: In function ‘test_bitmap_clear_all’:
-test/bitmap_test.c:431:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:455:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle2, -65535);
                                     ^
-test/bitmap_test.c:436:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:460:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle2, -65535);
                                     ^
-test/bitmap_test.c:442:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:466:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle3, 65536);
                                     ^~~~~
-test/bitmap_test.c:454:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+test/bitmap_test.c:478:36: warning: large integer implicitly truncated to unsigned type [-Woverflow]
      retval = bitmap_check(handle3, 65536);
                                     ^~~~~
 test/bitmap_test.c: In function ‘test_bitmap_create’:
-test/bitmap_test.c:122:5: warning: ‘__builtin_memcpy’ writing 14 bytes into a region of size 12 overflows the destination [-Wstringop-overflow=]
+test/bitmap_test.c:126:5: warning: ‘__builtin_memcpy’ writing 14 bytes into a region of size 12 overflows the destination [-Wstringop-overflow=]
      strcpy(attr.short_name, "h1_tempabcdef");
      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./bitmaptest
 
- writing logs to file /tmp/bitmap_683.log 
+ writing logs to file /tmp/bitmap_626.log 
 
 
      CUnit - A unit testing framework for C - Version 2.1-3
@@ -91,120 +89,120 @@ Suite: Bitmap basic test
 Run Summary:    Type  Total    Ran Passed Failed Inactive
               suites      1      1    n/a      0        0
                tests      6      6      6      0        0
-             asserts    124    124    124      0      n/a
+             asserts    132    132    132      0      n/a
 
-Valgrind for the Cunit Test
-============================
+CUnit & Valgrind.
+===================
 
-Elapsed time =    0.406 seconds
+Elapsed time =    0.375 seconds
 valgrind -v --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=9 ./bitmaptest || (echo "Leak detected"; exit 1)
-==2592== Memcheck, a memory error detector
-==2592== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==2592== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
-==2592== Command: ./bitmaptest
-==2592== 
---2592-- Valgrind options:
---2592--    -v
---2592--    --tool=memcheck
---2592--    --leak-check=full
---2592--    --show-leak-kinds=all
---2592--    --error-exitcode=9
---2592-- Contents of /proc/version:
---2592--   Linux version 4.4.0-17134-Microsoft (Microsoft@Microsoft.com) (gcc version 5.4.0 (GCC) ) #706-Microsoft Mon Apr 01 18:13:00 PST 2019
---2592-- 
---2592-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
---2592-- Page sizes: currently 4096, max supported 4096
---2592-- Valgrind library directory: /usr/lib/valgrind
---2592-- Reading syms from /home/vjanandr/bitmap2/bitmap/bitmaptest
---2592-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
---2592--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
---2592--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
---2592--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
---2592--   .. CRC is valid
---2592-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
---2592--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
---2592--   .. CRC mismatch (computed c25f395c wanted 0a9602a8)
---2592--    object doesn't have a symbol table
---2592--    object doesn't have a dynamic symbol table
---2592-- Scheduler: using generic scheduler lock implementation.
---2592-- Reading suppressions file: /usr/lib/valgrind/default.supp
-==2592== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-2592-by-vjanandr-on-???
-==2592== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-2592-by-vjanandr-on-???
-==2592== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-2592-by-vjanandr-on-???
-==2592== 
-==2592== TO CONTROL THIS PROCESS USING vgdb (which you probably
-==2592== don't want to do, unless you know exactly what you're doing,
-==2592== or are doing some strange experiment):
-==2592==   /usr/lib/valgrind/../../bin/vgdb --pid=2592 ...command...
-==2592== 
-==2592== TO DEBUG THIS PROCESS USING GDB: start GDB like this
-==2592==   /path/to/gdb ./bitmaptest
-==2592== and then give GDB the following command
-==2592==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=2592
-==2592== --pid is optional if only one valgrind process is running
-==2592== 
-==2592== error calling PR_SET_PTRACER, vgdb might block
---2592-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x58060901 (???)
---2592-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x5806091b (???)
---2592-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
---2592--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
---2592--   .. CRC mismatch (computed 4b63d83e wanted 670599e6)
---2592--    object doesn't have a symbol table
---2592-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
---2592--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
---2592--   .. CRC mismatch (computed a4b37bee wanted 8ad4dc94)
---2592--    object doesn't have a symbol table
-==2592== WARNING: new redirection conflicts with existing -- ignoring it
---2592--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x58060901 ???
---2592--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
---2592-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
---2592-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
---2592-- Reading syms from /usr/lib/x86_64-linux-gnu/libcunit.so.1.0.1
---2592--    object doesn't have a symbol table
---2592-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
---2592--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
---2592--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
---2592--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
---2592--   .. CRC is valid
---2592-- REDIR: 0x50e9c70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9f50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50eb7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9de0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9c10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9d40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x51070f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9fa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50ea0e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e87c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e8c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50f36c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9ff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9be0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x5107eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9f20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50e9ef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50eb7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x50ea040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
---2592-- REDIR: 0x51d93c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
---2592-- REDIR: 0x51d91d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
---2592-- REDIR: 0x50e2070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
---2592-- REDIR: 0x50e9590 (libc.so.6:__GI_strstr) redirected to 0x4c37760 (__strstr_sse2)
---2592-- REDIR: 0x51d9ab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
---2592-- REDIR: 0x51d9590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
---2592-- REDIR: 0x51d9ad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
+==3008== Memcheck, a memory error detector
+==3008== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==3008== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==3008== Command: ./bitmaptest
+==3008== 
+--3008-- Valgrind options:
+--3008--    -v
+--3008--    --tool=memcheck
+--3008--    --leak-check=full
+--3008--    --show-leak-kinds=all
+--3008--    --error-exitcode=9
+--3008-- Contents of /proc/version:
+--3008--   Linux version 4.4.0-17134-Microsoft (Microsoft@Microsoft.com) (gcc version 5.4.0 (GCC) ) #706-Microsoft Mon Apr 01 18:13:00 PST 2019
+--3008-- 
+--3008-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-avx-avx2-bmi
+--3008-- Page sizes: currently 4096, max supported 4096
+--3008-- Valgrind library directory: /usr/lib/valgrind
+--3008-- Reading syms from /home/vjanandr/bitmap2/bitmap/bitmaptest
+--3008-- Reading syms from /lib/x86_64-linux-gnu/ld-2.27.so
+--3008--   Considering /lib/x86_64-linux-gnu/ld-2.27.so ..
+--3008--   .. CRC mismatch (computed 1b7c895e wanted 2943108a)
+--3008--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/ld-2.27.so ..
+--3008--   .. CRC is valid
+--3008-- Reading syms from /usr/lib/valgrind/memcheck-amd64-linux
+--3008--   Considering /usr/lib/valgrind/memcheck-amd64-linux ..
+--3008--   .. CRC mismatch (computed c25f395c wanted 0a9602a8)
+--3008--    object doesn't have a symbol table
+--3008--    object doesn't have a dynamic symbol table
+--3008-- Scheduler: using generic scheduler lock implementation.
+--3008-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==3008== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-3008-by-vjanandr-on-???
+==3008== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-3008-by-vjanandr-on-???
+==3008== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-3008-by-vjanandr-on-???
+==3008== 
+==3008== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==3008== don't want to do, unless you know exactly what you're doing,
+==3008== or are doing some strange experiment):
+==3008==   /usr/lib/valgrind/../../bin/vgdb --pid=3008 ...command...
+==3008== 
+==3008== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==3008==   /path/to/gdb ./bitmaptest
+==3008== and then give GDB the following command
+==3008==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=3008
+==3008== --pid is optional if only one valgrind process is running
+==3008== 
+==3008== error calling PR_SET_PTRACER, vgdb might block
+--3008-- REDIR: 0x401f2f0 (ld-linux-x86-64.so.2:strlen) redirected to 0x58060901 (???)
+--3008-- REDIR: 0x401f0d0 (ld-linux-x86-64.so.2:index) redirected to 0x5806091b (???)
+--3008-- Reading syms from /usr/lib/valgrind/vgpreload_core-amd64-linux.so
+--3008--   Considering /usr/lib/valgrind/vgpreload_core-amd64-linux.so ..
+--3008--   .. CRC mismatch (computed 4b63d83e wanted 670599e6)
+--3008--    object doesn't have a symbol table
+--3008-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so
+--3008--   Considering /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so ..
+--3008--   .. CRC mismatch (computed a4b37bee wanted 8ad4dc94)
+--3008--    object doesn't have a symbol table
+==3008== WARNING: new redirection conflicts with existing -- ignoring it
+--3008--     old: 0x0401f2f0 (strlen              ) R-> (0000.0) 0x58060901 ???
+--3008--     new: 0x0401f2f0 (strlen              ) R-> (2007.0) 0x04c32db0 strlen
+--3008-- REDIR: 0x401d360 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4c33ee0 (strcmp)
+--3008-- REDIR: 0x401f830 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x4c374f0 (mempcpy)
+--3008-- Reading syms from /usr/lib/x86_64-linux-gnu/libcunit.so.1.0.1
+--3008--    object doesn't have a symbol table
+--3008-- Reading syms from /lib/x86_64-linux-gnu/libc-2.27.so
+--3008--   Considering /lib/x86_64-linux-gnu/libc-2.27.so ..
+--3008--   .. CRC mismatch (computed b1c74187 wanted 042cc048)
+--3008--   Considering /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.27.so ..
+--3008--   .. CRC is valid
+--3008-- REDIR: 0x50e9c70 (libc.so.6:memmove) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8d40 (libc.so.6:strncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9f50 (libc.so.6:strcasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8790 (libc.so.6:strcat) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8d70 (libc.so.6:rindex) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50eb7c0 (libc.so.6:rawmemchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9de0 (libc.so.6:mempcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9c10 (libc.so.6:bcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8d00 (libc.so.6:strncmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8800 (libc.so.6:strcmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9d40 (libc.so.6:memset) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x51070f0 (libc.so.6:wcschr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8ca0 (libc.so.6:strnlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8870 (libc.so.6:strcspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9fa0 (libc.so.6:strncasecmp) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8840 (libc.so.6:strcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50ea0e0 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8da0 (libc.so.6:strpbrk) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e87c0 (libc.so.6:index) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e8c70 (libc.so.6:strlen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50f36c0 (libc.so.6:memrchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9ff0 (libc.so.6:strcasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9be0 (libc.so.6:memchr) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x5107eb0 (libc.so.6:wcslen) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9050 (libc.so.6:strspn) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9f20 (libc.so.6:stpncpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50e9ef0 (libc.so.6:stpcpy) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50eb7f0 (libc.so.6:strchrnul) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x50ea040 (libc.so.6:strncasecmp_l) redirected to 0x4a2a6e0 (_vgnU_ifunc_wrapper)
+--3008-- REDIR: 0x51d93c0 (libc.so.6:__strrchr_avx2) redirected to 0x4c32730 (rindex)
+--3008-- REDIR: 0x51d91d0 (libc.so.6:__strchrnul_avx2) redirected to 0x4c37020 (strchrnul)
+--3008-- REDIR: 0x50e2070 (libc.so.6:malloc) redirected to 0x4c2faa0 (malloc)
+--3008-- REDIR: 0x50e9590 (libc.so.6:__GI_strstr) redirected to 0x4c37760 (__strstr_sse2)
+--3008-- REDIR: 0x51d9ab0 (libc.so.6:__mempcpy_avx_unaligned_erms) redirected to 0x4c37130 (mempcpy)
+--3008-- REDIR: 0x51d9590 (libc.so.6:__strlen_avx2) redirected to 0x4c32cf0 (strlen)
+--3008-- REDIR: 0x51d9ad0 (libc.so.6:__memcpy_avx_unaligned_erms) redirected to 0x4c366e0 (memmove)
 
- writing logs to file /tmp/bitmap_296.log 
---2592-- REDIR: 0x50e2950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
+ writing logs to file /tmp/bitmap_652.log 
+--3008-- REDIR: 0x50e2950 (libc.so.6:free) redirected to 0x4c30cd0 (free)
 
 
      CUnit - A unit testing framework for C - Version 2.1-3
@@ -213,12 +211,12 @@ valgrind -v --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exit
 
 Suite: Bitmap basic test
   Test: bitmap_create ...
- Bitmap word size = 1 --2592-- REDIR: 0x51d9f50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
---2592-- REDIR: 0x51d9720 (libc.so.6:__strnlen_avx2) redirected to 0x4c32c90 (strnlen)
---2592-- REDIR: 0x51c8100 (libc.so.6:__strncpy_ssse3) redirected to 0x4c32fb0 (strncpy)
---2592-- REDIR: 0x51d5ba0 (libc.so.6:__memcmp_avx2_movbe) redirected to 0x4c35e00 (bcmp)
---2592-- REDIR: 0x51b4d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
---2592-- REDIR: 0x51c6950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
+ Bitmap word size = 1 --3008-- REDIR: 0x51d5ba0 (libc.so.6:__memcmp_avx2_movbe) redirected to 0x4c35e00 (bcmp)
+--3008-- REDIR: 0x51b4d60 (libc.so.6:__strcmp_ssse3) redirected to 0x4c33da0 (strcmp)
+--3008-- REDIR: 0x51d9f50 (libc.so.6:__memset_avx2_unaligned_erms) redirected to 0x4c365d0 (memset)
+--3008-- REDIR: 0x51d9720 (libc.so.6:__strnlen_avx2) redirected to 0x4c32c90 (strnlen)
+--3008-- REDIR: 0x51c8100 (libc.so.6:__strncpy_ssse3) redirected to 0x4c32fb0 (strncpy)
+--3008-- REDIR: 0x51c6950 (libc.so.6:__strcpy_ssse3) redirected to 0x4c32dd0 (strcpy)
 passed
   Test: bitmap_set ...passed
   Test: bitmap_check ...passed
@@ -229,15 +227,15 @@ passed
 Run Summary:    Type  Total    Ran Passed Failed Inactive
               suites      1      1    n/a      0        0
                tests      6      6      6      0        0
-             asserts    124    124    124      0      n/a
+             asserts    132    132    132      0      n/a
 
-Elapsed time =    1.766 seconds
-==2592== 
-==2592== HEAP SUMMARY:
-==2592==     in use at exit: 0 bytes in 0 blocks
-==2592==   total heap usage: 33,166 allocs, 33,166 frees, 102,247,647 bytes allocated
-==2592== 
-==2592== All heap blocks were freed -- no leaks are possible
-==2592== 
-==2592== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
-==2592== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+Elapsed time =    1.859 seconds
+==3008== 
+==3008== HEAP SUMMARY:
+==3008==     in use at exit: 0 bytes in 0 blocks
+==3008==   total heap usage: 33,194 allocs, 33,194 frees, 102,362,335 bytes allocated
+==3008== 
+==3008== All heap blocks were freed -- no leaks are possible
+==3008== 
+==3008== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==3008== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)

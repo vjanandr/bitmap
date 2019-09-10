@@ -469,6 +469,7 @@ bitmap_get_wordsize (uint16_t *size)
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
+        return BITMAP_RETVAL_INVALID_INPUT;
     }
     *size = sizeof(bitmapword_t);
     return BITMAP_RETVAL_SUCCESS;

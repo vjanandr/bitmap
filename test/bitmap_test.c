@@ -26,6 +26,9 @@ void test_bitmap_create ()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     printf("\n Bitmap word size = %d ", wsize);
 
+    retval = bitmap_get_wordsize(NULL);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
+
     memset(&attr, 0, sizeof(bitmap_attr_t));
     // Set the proper values.
     strcpy(attr.short_name, "handle-1");
@@ -119,6 +122,7 @@ void test_bitmap_create ()
     retval = bitmap_create(&handle1_temp, &attr);
     CU_ASSERT_TRUE(retval != BITMAP_RETVAL_SUCCESS);
 
+    //strname greater than 12, fall back to defaul name.
     strcpy(attr.short_name, "h1_tempabcdef");
     attr.bits_per_block = 1024;
     retval = bitmap_create(&handle1_temp, &attr);
@@ -212,6 +216,7 @@ void test_bitmap_set ()
                                     &count);
     CU_ASSERT_TRUE(count == 4096);
 
+    // 65536 roll back to 0
     retval = bitmap_set(handle3, 65536);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle3,
@@ -229,15 +234,17 @@ void test_bitmap_set ()
                                     &count);
                                     */
 
+    // -65535 is actually 1
     retval = bitmap_set(handle2, -65535);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle2,
                                     &count);
-
+    // -1 is actually 65535.
     retval = bitmap_set(handle3, -1);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle3,
                                     &count);
+    // -65535 is actually 1
     retval = bitmap_set(handle3, -65535);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle3,
@@ -250,6 +257,7 @@ void test_bitmap_set ()
                                     &count);
                                     */
 
+    // 90000 is actually 24464
     retval = bitmap_set(handle3, 90000);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle1,
@@ -362,6 +370,7 @@ void test_bitmap_clear()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_check(handle2, 1024);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+    // First bit of a new block
     retval = bitmap_check(handle2, 1025);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
 
@@ -387,6 +396,23 @@ void test_bitmap_clear()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_check(handle3, 1);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+
+    // Set adjacent bits, clearing one should not clear other.
+    retval = bitmap_set(handle3, 10);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_check(handle3, 10);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+    retval = bitmap_set(handle3, 11);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_check(handle3, 11);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+    retval = bitmap_clear(handle3,10);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_check(handle3, 10);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+    retval = bitmap_check(handle3, 11);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
 
 
     // Such a block was never set.
@@ -465,6 +491,7 @@ void test_bitmap_destroy()
 
     retval = bitmap_destroy(&handle1);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+
     retval = bitmap_check(handle1, 3000);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
 
