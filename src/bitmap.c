@@ -310,9 +310,9 @@ bitmap_check (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
           __FUNCTION__, bitmap_ptr->short_name, bitpos);
         return BITMAP_RETVAL_MATCHED;
     }
-		vlog("\n%s [%s] sname %s Bitpos %d not set",
-          bitmap_get_log_string(BITMAP_EVENT),
-          __FUNCTION__, bitmap_ptr->short_name, bitpos);
+    vlog("\n%s [%s] sname %s Bitpos %d not set",
+            bitmap_get_log_string(BITMAP_EVENT),
+            __FUNCTION__, bitmap_ptr->short_name, bitpos);
     return BITMAP_RETVAL_MATCH_FAIL;
 }
 
@@ -341,13 +341,21 @@ bitmap_clear (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     }
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
-    block->bitmap[word_pos] = block->bitmap[word_pos] & (~(b_one << word_pos_offset)); 
-    vlog("\n%s [%s] sname %s, bitpos %d block_count %d block number %d word_pos %d offset %d",
-            bitmap_get_log_string(BITMAP_EVENT), 
-            __FUNCTION__, bitmap_ptr->short_name,
-            bitpos, bitmap_ptr->block_count, block->block_number, 
-            word_pos, word_pos_offset);
-    return BITMAP_RETVAL_SUCCESS;
+    if (block->bitmap[word_pos] & (b_one << word_pos_offset)) {
+        block->bitmap[word_pos] = block->bitmap[word_pos] & (~(b_one << word_pos_offset)); 
+        vlog("\n%s [%s] sname %s, bitpos %d block_count %d block number %d word_pos %d offset %d",
+                bitmap_get_log_string(BITMAP_EVENT), 
+                __FUNCTION__, bitmap_ptr->short_name,
+                bitpos, bitmap_ptr->block_count, block->block_number, 
+                word_pos, word_pos_offset);
+        return BITMAP_RETVAL_SUCCESS;
+    }
+    vlog("\n%s [%s] sname %s, bitpos %d not set block_count %d block number %d word_pos %d offset %d",
+                bitmap_get_log_string(BITMAP_ERROR), 
+                __FUNCTION__, bitmap_ptr->short_name,
+                bitpos, bitmap_ptr->block_count, block->block_number, 
+                word_pos, word_pos_offset);
+    return BITMAP_RETVAL_INVALID_INPUT;
 }
 
 bitmap_retval_t

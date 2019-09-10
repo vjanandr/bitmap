@@ -199,19 +199,6 @@ void test_bitmap_set ()
                                     &count);
     CU_ASSERT_TRUE(count == 2);
 
-    retval = bitmap_set(handle2, 65535);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    retval = bitmap_get_block_count(handle2,
-                                    &count);
-    CU_ASSERT_TRUE(count == 64);
-
-    // 65536 i 
-    retval = bitmap_set(handle2, 65536);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    retval = bitmap_get_block_count(handle2,
-                                    &count);
-    CU_ASSERT_TRUE(count == 64);
-
     retval = bitmap_set(handle3, 0);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle3,
@@ -242,10 +229,6 @@ void test_bitmap_set ()
                                     &count);
                                     */
 
-    retval = bitmap_set(handle2, -1);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    retval = bitmap_get_block_count(handle2,
-                                    &count);
     retval = bitmap_set(handle2, -65535);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     retval = bitmap_get_block_count(handle2,
@@ -266,11 +249,6 @@ void test_bitmap_set ()
     retval = bitmap_get_block_count(handle1,
                                     &count);
                                     */
-
-    retval = bitmap_set(handle2, 90000);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    retval = bitmap_get_block_count(handle1,
-                                    &count);
 
     retval = bitmap_set(handle3, 90000);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
@@ -308,6 +286,48 @@ void test_bitmap_check ()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
     retval = bitmap_check(handle3, -20);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle1, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle2, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle2, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    // 65536 is actually 0
+    retval = bitmap_check(handle2, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    // Set the last bit in the last word in the lasd block
+    retval = bitmap_check(handle3, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle3, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle3, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle2, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle2, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle3, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle3, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle2, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    // 90000 is actually 24464
+    retval = bitmap_check(handle3, 24464);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
 }
 
 void test_bitmap_clear() 
@@ -327,13 +347,13 @@ void test_bitmap_clear()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
 
     retval = bitmap_clear(handle3, 15);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
     
     retval = bitmap_check(handle3, 53);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
 
     retval = bitmap_clear(handle3, 53);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
 
     retval = bitmap_clear(handle1, 5000);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
@@ -344,6 +364,37 @@ void test_bitmap_clear()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
     retval = bitmap_check(handle2, 1025);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_clear(handle1, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    // 65536 is actually 0
+    retval = bitmap_check(handle1, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle1, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+
+    // Set the last bit in the last word in the lasd block
+    retval = bitmap_clear(handle3, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+
+    retval = bitmap_check(handle1, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    // -65535 is 1
+    retval = bitmap_clear(handle3, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_check(handle3, 1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+
+    // Such a block was never set.
+    retval = bitmap_clear(handle2, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_INVALID_INPUT);
+
+    retval = bitmap_set(handle3, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
 }
 
 void test_bitmap_clear_all() 
@@ -373,6 +424,35 @@ void test_bitmap_clear_all()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
     // Bit not set
     retval = bitmap_check(handle1, 1024);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle2, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_clear_all(handle2);
+
+    retval = bitmap_check(handle2, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle3, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle3, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
+
+    retval = bitmap_check(handle3, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+
+    retval = bitmap_clear_all(handle3);
+
+    retval = bitmap_check(handle3, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle3, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+
+    retval = bitmap_check(handle3, -1);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
 }
 
