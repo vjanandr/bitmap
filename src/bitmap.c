@@ -245,7 +245,7 @@ bitmap_set (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     }
 
     block_number = BITMAP_GET_BLOCK_NUMBER(bitmap_ptr, bitpos);
-    vlog("\n%s [%s] sname %s, set bit %d block_count %d block number %d",
+    vlog("\n%s [%s] sname %s, bitpos %d block_count %d block number %d",
             bitmap_get_log_string(BITMAP_EVENT), 
             __FUNCTION__, bitmap_ptr->short_name,
             bitpos, bitmap_ptr->block_count, block_number);
@@ -265,6 +265,11 @@ bitmap_set (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
     block->bitmap[word_pos] = block->bitmap[word_pos] | (b_one << word_pos_offset); 
 
+    vlog("\n%s [%s] sname %s, set bit %d block_count %d block number %d word_pos %d offset %d",
+            bitmap_get_log_string(BITMAP_EVENT), 
+            __FUNCTION__, bitmap_ptr->short_name,
+            bitpos, bitmap_ptr->block_count, block_number, 
+            word_pos, word_pos_offset);
     return BITMAP_RETVAL_SUCCESS;
 }
 
@@ -294,13 +299,18 @@ bitmap_check (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     }
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
+    vlog("\n%s [%s] sname %s, bitpos %d block_count %d block number %d word_pos %d offset %d",
+            bitmap_get_log_string(BITMAP_EVENT), 
+            __FUNCTION__, bitmap_ptr->short_name,
+            bitpos, bitmap_ptr->block_count, block->block_number, 
+            word_pos, word_pos_offset);
     if (block->bitmap[word_pos] & (b_one << word_pos_offset)) {
 		vlog("\n%s [%s] sname %s Bitpos %d set",
           bitmap_get_log_string(BITMAP_EVENT),
           __FUNCTION__, bitmap_ptr->short_name, bitpos);
         return BITMAP_RETVAL_MATCHED;
     }
-    vlog("\n%s [%s] sname %s Bitpos %d not set",
+		vlog("\n%s [%s] sname %s Bitpos %d not set",
           bitmap_get_log_string(BITMAP_EVENT),
           __FUNCTION__, bitmap_ptr->short_name, bitpos);
     return BITMAP_RETVAL_MATCH_FAIL;
@@ -332,9 +342,11 @@ bitmap_clear (struct bitmap_t_ *bitmap_ptr, uint16_t bitpos)
     word_pos = BITMAP_GET_BLOCK_WORDPOS(bitmap_ptr, bitpos);
     word_pos_offset = BITMAP_GET_BLOCK_WORDPOS_OFFSET(bitmap_ptr, bitpos);
     block->bitmap[word_pos] = block->bitmap[word_pos] & (~(b_one << word_pos_offset)); 
-    vlog("\n%s [%s] sname %s bitpos %d cleared",
-                bitmap_get_log_string(BITMAP_ERROR),
-                __FUNCTION__, bitmap_ptr->short_name, bitpos);
+    vlog("\n%s [%s] sname %s, bitpos %d block_count %d block number %d word_pos %d offset %d",
+            bitmap_get_log_string(BITMAP_EVENT), 
+            __FUNCTION__, bitmap_ptr->short_name,
+            bitpos, bitmap_ptr->block_count, block->block_number, 
+            word_pos, word_pos_offset);
     return BITMAP_RETVAL_SUCCESS;
 }
 
@@ -429,12 +441,15 @@ bitmap_retval_t
 bitmap_get_block_count (struct bitmap_t_ *bitmap_ptr,
                         uint16_t *count)
 {
-   if (!BITMAP_VALIDATE_MEM(bitmap_ptr) || !count) {
+    if (!BITMAP_VALIDATE_MEM(bitmap_ptr) || !count) {
         vlog("\n%s [%s] Invalid handle",
                 bitmap_get_log_string(BITMAP_ERROR),
                 __FUNCTION__);
         return BITMAP_RETVAL_INVALID_INPUT;
     }
+    vlog("\n%s [%s] sname %s block_count %d", 
+          bitmap_get_log_string(BITMAP_EVENT), __FUNCTION__,
+          bitmap_ptr->short_name, bitmap_ptr->block_count);
     *count = bitmap_ptr->block_count;
     return BITMAP_RETVAL_SUCCESS;
 }

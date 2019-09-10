@@ -13,19 +13,19 @@ CFLAGS = -g -Wuninitialized -Wreturn-type \
 
 INC_DIRS = -I./include
 
-bitmap_basic_test.o: bitmap.o ./test/bitmap_basic_test.c
-	$(cc) $(CFLAGS) $(INC_DIRS) -o bitmaptest_basic $^ -lcunit
+bitmap_test.o: bitmap.o ./test/bitmap_test.c
+	$(cc) $(CFLAGS) $(INC_DIRS) -o bitmaptest $^ -lcunit
 
-test: bitmaptest_basic
+test: bitmaptest
 
-testall: bitmap_sa bitmaptest_basic bitmaptest_basic_mem
+testall: bitmap_sa bitmaptest bitmaptest_mem
 
 
-bitmaptest_basic: bitmap_basic_test.o
-	./bitmaptest_basic
+bitmaptest: bitmap_test.o
+	./bitmaptest
 
-bitmaptest_basic_mem: bitmap_basic_test.o
-	valgrind -v --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=9 ./bitmaptest_basic || (echo "Leak detected"; exit 1)
+bitmaptest_mem: bitmap_test.o
+	valgrind -v --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=9 ./bitmaptest || (echo "Leak detected"; exit 1)
 
 bitmap_sa:
 	cppcheck .
@@ -36,4 +36,4 @@ bitmap.o: ./src/bitmap.c
 .PHONY: clean
 
 clean:
-	rm -f *.o bitmaptest_basic
+	rm -f *.o bitmaptest
