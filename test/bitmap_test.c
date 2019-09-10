@@ -12,7 +12,7 @@ bitmap_handle handle2;
 bitmap_handle handle3;
 uint16_t wsize = 0;
 
-void bitmap_basic_1_create ()
+void test_bitmap_create ()
 {
     bitmap_handle handle1_temp;
     bitmap_retval_t retval;
@@ -21,9 +21,10 @@ void bitmap_basic_1_create ()
     uint16_t count, wsize;
 
     bits_per_block = bytes_per_block = words_per_block = 0;
+    // Get the word size
     retval = bitmap_get_wordsize(&wsize);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    printf("\n Bitmap word size = %d", wsize);
+    printf("\n Bitmap word size = %d ", wsize);
 
     memset(&attr, 0, sizeof(bitmap_attr_t));
     // Set the proper values.
@@ -39,14 +40,12 @@ void bitmap_basic_1_create ()
     retval = bitmap_create(&handle2, &attr);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
 
-
     memset(&attr, 0, sizeof(bitmap_attr_t));
     // Set the proper values.
     strcpy(attr.short_name, "handle-3");
     attr.bits_per_block = wsize*8*2;
     retval = bitmap_create(&handle3, &attr);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-
 
     retval = bitmap_get_block_details(handle1, 
                                       &bits_per_block, 
@@ -128,7 +127,7 @@ void bitmap_basic_1_create ()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
 }
 
-void bitmap_basic_1_set ()
+void test_bitmap_set ()
 {
     bitmap_retval_t retval;
     uint16_t count;
@@ -178,8 +177,107 @@ void bitmap_basic_1_set ()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
     CU_ASSERT_TRUE(count == 2);
 
+    retval = bitmap_set(handle1, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+    /*
+    retval = bitmap_set(handle1, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+
+    retval = bitmap_set(handle1, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+                                    */
+
+    retval = bitmap_set(handle2, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle2,
+                                    &count);
+    CU_ASSERT_TRUE(count == 2);
+
+    retval = bitmap_set(handle2, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle2,
+                                    &count);
+    CU_ASSERT_TRUE(count == 64);
+
+    // 65536 i 
+    retval = bitmap_set(handle2, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle2,
+                                    &count);
+    CU_ASSERT_TRUE(count == 64);
+
+    retval = bitmap_set(handle3, 0);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle3,
+                                    &count);
+    CU_ASSERT_TRUE(count == 4);
+
+    // Set the last bit in the last word in the lasd block
+    retval = bitmap_set(handle3, 65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle3,
+                                    &count);
+    CU_ASSERT_TRUE(count == 4096);
+
+    retval = bitmap_set(handle3, 65536);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle3,
+                                    &count);
+    CU_ASSERT_TRUE(count == 4096);
+
+    /*
+    retval = bitmap_set(handle1, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+    retval = bitmap_set(handle1, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+                                    */
+
+    retval = bitmap_set(handle2, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle2,
+                                    &count);
+    retval = bitmap_set(handle2, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle2,
+                                    &count);
+
+    retval = bitmap_set(handle3, -1);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle3,
+                                    &count);
+    retval = bitmap_set(handle3, -65535);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle3,
+                                    &count);
+
+    /*
+    retval = bitmap_set(handle1, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+                                    */
+
+    retval = bitmap_set(handle2, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
+
+    retval = bitmap_set(handle3, 90000);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_get_block_count(handle1,
+                                    &count);
 }
-void bitmap_basic_1_check ()
+void test_bitmap_check ()
 {
     bitmap_retval_t retval;
     retval = bitmap_check(BITMAP_HANDLE_NULL, 20);
@@ -212,7 +310,7 @@ void bitmap_basic_1_check ()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
 }
 
-void bitmap_basic_1_clear() 
+void test_bitmap_clear() 
 {
     bitmap_retval_t retval;
 
@@ -242,11 +340,13 @@ void bitmap_basic_1_clear()
 
     retval = bitmap_clear(handle2, 1024);
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
-    retval = bitmap_clear(handle2, 1025);
-    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_SUCCESS);
+    retval = bitmap_check(handle2, 1024);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
+    retval = bitmap_check(handle2, 1025);
+    CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCHED);
 }
 
-void bitmap_basic_1_clear_all() 
+void test_bitmap_clear_all() 
 {
     bitmap_retval_t retval;
 
@@ -276,7 +376,7 @@ void bitmap_basic_1_clear_all()
     CU_ASSERT_TRUE(retval == BITMAP_RETVAL_MATCH_FAIL);
 }
 
-void bitmap_basic_1_destroy() 
+void test_bitmap_destroy() 
 {
     bitmap_retval_t retval;
 
@@ -321,75 +421,37 @@ int main ()
         return CU_get_error();
     }
 
-    if (CU_add_test(psuite, "bitmap_basic_1_create",
-                    bitmap_basic_1_create) == NULL) {
+    if (CU_add_test(psuite, "bitmap_create",
+                    test_bitmap_create) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
 
-    if (CU_add_test(psuite, "bitmap_1_set",
-                bitmap_basic_1_set) == NULL) {
+    if (CU_add_test(psuite, "bitmap_set",
+                test_bitmap_set) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    if (CU_add_test(psuite, "bitmap_1_check",
-                bitmap_basic_1_check) == NULL) {
+    if (CU_add_test(psuite, "bitmap_check",
+                test_bitmap_check) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    if (CU_add_test(psuite, "bitmap_1_clear",
-                bitmap_basic_1_clear) == NULL) {
+    if (CU_add_test(psuite, "bitmap_clear",
+                test_bitmap_clear) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    if (CU_add_test(psuite, "bitmap_1_clear_all",
-                bitmap_basic_1_clear_all) == NULL) {
+    if (CU_add_test(psuite, "bitmap_clear_all",
+                test_bitmap_clear_all) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    if (CU_add_test(psuite, "bitmap_1_destroy",
-                bitmap_basic_1_destroy) == NULL) {
+    if (CU_add_test(psuite, "bitmap_destroy",
+                test_bitmap_destroy) == NULL) {
         CU_cleanup_registry();
         return CU_get_error();
     }
-    /*
-    if (CU_add_test(psuite, "bitmap_1_check_negative",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    if (CU_add_test(psuite, "bitmap_1_clear_negative",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    if (CU_add_test(psuite, "bitmap_1_clear",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    if (CU_add_test(psuite, "bitmap_1_set_grow",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    if (CU_add_test(psuite, "bitmap_1_check_grow",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    if (CU_add_test(psuite, "bitmap_1_check_grow_negative",
-                bitmap_1_set) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    if (CU_add_test(psuite, "bitmap_2_create",
-                    bitmap_create_2) == NULL) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-    */
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
     CU_cleanup_registry();
